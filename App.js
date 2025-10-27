@@ -1,51 +1,35 @@
-import { useState, useEffect } from 'react';
-import { createConnection, sendMessage } from './chat.js';
-
-const serverUrl = 'https://localhost:1234';
-
-function ChatRoom({ roomId }) {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    const connection = createConnection(serverUrl, roomId);
-    connection.connect();
-    return () => connection.disconnect();
-  }, [roomId]);
-
-  function handleSendClick() {
-    sendMessage(message);
+export default function Timer() {
+    const [count, setCount] = useState(0);
+    const [increment, setIncrement] = useState(1);
+  
+    useEffect(() => {
+      const id = setInterval(() => {
+        setCount(c => c + increment);
+      }, 1000);
+      return () => {
+        clearInterval(id);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+  
+    return (
+      <>
+        <h1>
+          Counter: {count}
+          <button onClick={() => setCount(0)}>Reset</button>
+        </h1>
+        <hr />
+        <p>
+          Every second, increment by:
+          <button disabled={increment === 0} onClick={() => {
+            setIncrement(i => i - 1);
+          }}>–</button>
+          <b>{increment}</b>
+          <button onClick={() => {
+            setIncrement(i => i + 1);
+          }}>+</button>
+        </p>
+      </>
+    );
   }
-
-  return (
-    <>
-      <h1>Welcome to the {roomId} room!</h1>
-      <input value={message} onChange={e => setMessage(e.target.value)} />
-      <button onClick={handleSendClick}>Send</button>
-    </>
-  );
-}
-
-export default function App() {
-  const [roomId, setRoomId] = useState('general');
-  const [show, setShow] = useState(false);
-  return (
-    <>
-      <label>
-        Choose the chat room:{' '}
-        <select
-          value={roomId}
-          onChange={e => setRoomId(e.target.value)}
-        >
-          <option value="general">general</option>
-          <option value="travel">travel</option>
-          <option value="music">music</option>
-        </select>
-      </label>
-      <button onClick={() => setShow(!show)}>
-        {show ? 'Close chat' : 'Open chat'}
-      </button>
-      {show && <hr />}
-      {show && <ChatRoom roomId={roomId} />}
-    </>
-  );
-}
+  
